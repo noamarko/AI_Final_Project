@@ -78,19 +78,19 @@ int Supplier::GetRoomIndex()
 }
 
 /* Check if soldier is behind a shelter */
-bool Soldier::isSecure(MazeController* mazeController, Soldier opponent)
+bool Supplier::isSecure(MazeHandler* mazeHandler, Soldier opponent)
 {
     int minX, minY, maxX, maxY;
-    minX = mazeController->rooms[opponent.GetRoomIndex()].GetCenterX() - mazeController->rooms[opponent.GetRoomIndex()].GetWidth() / 2;
-    minY = mazeController->rooms[opponent.GetRoomIndex()].GetCenterY() - mazeController->rooms[opponent.GetRoomIndex()].GetHeight() / 2;
-    maxX = minX + mazeController->rooms[opponent.GetRoomIndex()].GetWidth();
-    maxY = minY + mazeController->rooms[opponent.GetRoomIndex()].GetHeight();
+    minX = mazeHandler->rooms[opponent.GetRoomIndex()].GetCenterX() - mazeHandler->rooms[opponent.GetRoomIndex()].GetWidth() / 2;
+    minY = mazeHandler->rooms[opponent.GetRoomIndex()].GetCenterY() - mazeHandler->rooms[opponent.GetRoomIndex()].GetHeight() / 2;
+    maxX = minX + mazeHandler->rooms[opponent.GetRoomIndex()].GetWidth();
+    maxY = minY + mazeHandler->rooms[opponent.GetRoomIndex()].GetHeight();
 
     // Check if a soldier is behind a wall and the wall is not an external point from the room
-    if ((mazeController->maze[locationY + 1][locationX] == WALL && locationY + 1 < maxY) ||
-        (mazeController->maze[locationY - 1][locationX] == WALL && locationY - 1 > minY) ||
-        (mazeController->maze[locationY][locationX + 1] == WALL && locationX + 1 < maxX) ||
-        (mazeController->maze[locationY][locationX - 1] == WALL && locationX - 1 > minX))
+    if ((mazeHandler->maze[locationY + 1][locationX] == WALL && locationY + 1 < maxY) ||
+        (mazeHandler->maze[locationY - 1][locationX] == WALL && locationY - 1 > minY) ||
+        (mazeHandler->maze[locationY][locationX + 1] == WALL && locationX + 1 < maxX) ||
+        (mazeHandler->maze[locationY][locationX - 1] == WALL && locationX - 1 > minX))
         return true;
     return false;
 
@@ -157,7 +157,7 @@ void Supplier::FindTargetPoint(int x1, int y1, int x2, int y2)
 }
 
 /* Find the secure point in the current room */
-void Soldier::SetSecurePoint(MazeController* mazeController, Soldier opponent, Room room)
+void Supplier::SetSecurePoint(MazeHandler* mazeHandler, Soldier opponent, Room room)
 {
     double h = 200, temp;
     int r = 0, c = 0;
@@ -175,7 +175,7 @@ void Soldier::SetSecurePoint(MazeController* mazeController, Soldier opponent, R
         {
             temp = sqrt(pow(((double)locationX - (double)pCurrent->GetCol()), 2) +
                 pow((double)locationY - (double)pCurrent->GetRow() - 1, 2));
-            if (mazeController->maze[pCurrent->GetRow() - 1][pCurrent->GetCol()] == SPACE && temp < h)
+            if (mazeHandler->maze[pCurrent->GetRow() - 1][pCurrent->GetCol()] == SPACE && temp < h)
             {
                 c = pCurrent->GetCol();
                 r = pCurrent->GetRow() - 1;
@@ -188,7 +188,7 @@ void Soldier::SetSecurePoint(MazeController* mazeController, Soldier opponent, R
         {
             temp = sqrt(pow(((double)locationX - (double)pCurrent->GetCol()), 2) +
                 pow((double)locationY - (double)pCurrent->GetRow() + 1, 2));
-            if (mazeController->maze[pCurrent->GetRow() + 1][pCurrent->GetCol()] == SPACE && temp < h)
+            if (mazeHandler->maze[pCurrent->GetRow() + 1][pCurrent->GetCol()] == SPACE && temp < h)
             {
                 c = pCurrent->GetCol();
                 r = pCurrent->GetRow() + 1;
@@ -201,7 +201,7 @@ void Soldier::SetSecurePoint(MazeController* mazeController, Soldier opponent, R
         {
             temp = sqrt(pow(((double)locationX - (double)pCurrent->GetCol()) + 1, 2) +
                 pow((double)locationY - (double)pCurrent->GetRow(), 2));
-            if (mazeController->maze[pCurrent->GetRow()][pCurrent->GetCol() + 1] == SPACE && temp < h)
+            if (mazeHandler->maze[pCurrent->GetRow()][pCurrent->GetCol() + 1] == SPACE && temp < h)
             {
                 c = pCurrent->GetCol() + 1;
                 r = pCurrent->GetRow();
@@ -214,7 +214,7 @@ void Soldier::SetSecurePoint(MazeController* mazeController, Soldier opponent, R
         {
             temp = sqrt(pow(((double)locationX - (double)pCurrent->GetCol() - 1), 2) +
                 pow((double)locationY - (double)pCurrent->GetRow(), 2));
-            if (mazeController->maze[pCurrent->GetRow()][pCurrent->GetCol() - 1] == SPACE && temp < h)
+            if (mazeHandler->maze[pCurrent->GetRow()][pCurrent->GetCol() - 1] == SPACE && temp < h)
             {
                 c = pCurrent->GetCol() - 1;
                 r = pCurrent->GetRow();
@@ -224,12 +224,12 @@ void Soldier::SetSecurePoint(MazeController* mazeController, Soldier opponent, R
 
     }
 
-    mazeController->maze[r][c] = SECURE_POINT;
+    mazeHandler->maze[r][c] = SECURE_POINT;
     target = new Node(r, c, nullptr, 0, 0);
     start = new Node(locationY, locationX, nullptr, 0, h);
 }
 
-void Soldier::SetPath(Node* current_node)
+void Supplier::SetPath(Node* current_node)
 {
     /* Bulid the path of the soldier based on the A* algorithm */
     while (!current_node->operator==(*start))
@@ -239,42 +239,42 @@ void Soldier::SetPath(Node* current_node)
     }
 }
 
-void Soldier::EmptyPath()
+void Supplier::EmptyPath()
 {
     /* Empty the path if we need to go to new target point */
     while (!path.empty())
         path.pop_back();
 }
 
-void Soldier::Move(MazeController* mazeController, int type_of_points)
+void Supplier::Move(MazeHandler* mazeHandler, int type_of_points)
 {
     int minX = 0, minY = 0, maxX = 0, maxY = 0;
     /* Calculate minimum and maximum indexes in the room */
     if (room_index != PATH_INDEX)
     {
-        minX = mazeController->rooms[room_index].GetCenterX() - mazeController->rooms[room_index].GetWidth() / 2;
-        maxX = minX + mazeController->rooms[room_index].GetWidth();
-        minY = mazeController->rooms[room_index].GetCenterY() - mazeController->rooms[room_index].GetHeight() / 2;
-        maxY = minY + mazeController->rooms[room_index].GetHeight();
+        minX = mazeHandler->rooms[room_index].GetCenterX() - mazeHandler->rooms[room_index].GetWidth() / 2;
+        maxX = minX + mazeHandler->rooms[room_index].GetWidth();
+        minY = mazeHandler->rooms[room_index].GetCenterY() - mazeHandler->rooms[room_index].GetHeight() / 2;
+        maxY = minY + mazeHandler->rooms[room_index].GetHeight();
     }
 
     if (!path.empty()) // Walk in the path
-        WalkInPath(mazeController, minX, minY, maxX, maxY);
+        WalkInPath(mazeHandler, minX, minY, maxX, maxY);
 
     else // Arrived to target
         TargetAchieved(type_of_points);
 
 }
 
-void Soldier::WalkInPath(MazeController* mazeController, int minX, int minY, int maxX, int maxY)
+void Supplier::WalkInPath(MazeHandler* mazeHandler, int minX, int minY, int maxX, int maxY)
 {
-    mazeController->maze[locationY][locationX] = SPACE; // Delete soldier from previous position
+    mazeHandler->maze[locationY][locationX] = SPACE; // Delete soldier from previous position
     Node* pcurrent = path.back(); // The last node in the path is the next step of the soldier
     path.pop_back(); // Remove it
 
-    if (mazeController->maze[pcurrent->GetRow()][pcurrent->GetCol()] == SPACE && !isInRoom) // If soldier is in room
+    if (mazeHandler->maze[pcurrent->GetRow()][pcurrent->GetCol()] == SPACE && !isInRoom) // If soldier is in room
     {
-        room_index = CalculateRoomIndex(mazeController);
+        room_index = CalculateRoomIndex(mazeHandler);
         if (room_index != PATH_INDEX)
             isInRoom = true;
     }
@@ -286,24 +286,25 @@ void Soldier::WalkInPath(MazeController* mazeController, int minX, int minY, int
 
     locationX = pcurrent->GetCol();
     locationY = pcurrent->GetRow();
-    mazeController->maze[locationY][locationX] = color;
+    mazeHandler->maze[locationY][locationX] = color;
 }
 
-void Soldier::TargetAchieved(int type_of_points)
+void Supplier::TargetAchieved(int type_of_points)
 {
     if (type_of_points == HEALT_POINTS)
     {
-        health += HEALTH_POINTS_STOCK;
-        if (color == SPETSNAZ)
-            printf("Spetsnaz Soldier took Health Points!, Health: %d\n", health);
+        health_ammo += HEALTH_POINTS_STOCK;
+        if (color == CYAN_SOLDIER)
+            printf("Spetsnaz Soldier took Health Points!, Health: %d\n", health_ammo);
         else
-            printf("Navy Seal took Health Points!, Health: %d\n", health);
+            printf("Navy Seal took Health Points!, Health: %d\n", health_ammo);
     }
     else if (type_of_points == AMMO_STOCK)
     {
         bullets_ammo += BULLETS_STOCK;
         grenade_ammo += GRENADE_STOCK;
-        if (color == SPETSNAZ)
+        if (color == CYAN_SOLDIER)
+        if (color == CYAN_SOLDIER)
             printf("Spetsnaz Soldier took Ammo!, Bullets: %d, Grenades: %d\n", bullets_ammo, grenade_ammo);
         else
             printf("Navy Seal took Ammo!, Bullets: %d, Grenades: %d\n", bullets_ammo, grenade_ammo);
@@ -313,16 +314,16 @@ void Soldier::TargetAchieved(int type_of_points)
 }
 
 /* Calculate the soldier's room index while he is moving */
-int Supplier::CalculateRoomIndex(MazeController* mazeController)
+int Supplier::CalculateRoomIndex(MazeHandler* mazeHandler)
 {
     int i, minX, minY, maxX, maxY;
     for (i = 0; i < NUM_ROOMS; i++)
     {
         /* Calculate minimum and maximum indexes in the current room */
-        minX = mazeController->rooms[i].GetCenterX() - mazeController->rooms[i].GetWidth() / 2;
-        maxX = minX + mazeController->rooms[i].GetWidth();
-        minY = mazeController->rooms[i].GetCenterY() - mazeController->rooms[i].GetHeight() / 2;
-        maxY = minY + mazeController->rooms[i].GetHeight();
+        minX = mazeHandler->rooms[i].GetCenterX() - mazeHandler->rooms[i].GetWidth() / 2;
+        maxX = minX + mazeHandler->rooms[i].GetWidth();
+        minY = mazeHandler->rooms[i].GetCenterY() - mazeHandler->rooms[i].GetHeight() / 2;
+        maxY = minY + mazeHandler->rooms[i].GetHeight();
         if (locationY >= minY && locationY <= maxY && locationX >= minX && locationX <= maxX) // The Supplier is in this room
         {
             //room_index = i;
@@ -337,7 +338,7 @@ int Supplier::CalculateRoomIndex(MazeController* mazeController)
 
 /* Adding neighbors to calculate the next step of A* */
 void Supplier::AddNextStep(Node* pCurrent, DirectionType directionType, priority_queue <Node*, vector<Node*>, CompareNodes>& pq,
-    vector <Node>& gray, vector <Node>& black, MazeController* mazeController)
+    vector <Node>& gray, vector <Node>& black, MazeHandler* mazeHandler)
 {
     int i = 0, j = 0;
     Node* pn;
@@ -364,8 +365,8 @@ void Supplier::AddNextStep(Node* pCurrent, DirectionType directionType, priority
         j = pCurrent->GetCol() + 1;
         break;
     }
-    h = mazeController->Distance(j, i, target->GetCol(), target->GetRow());
-    g = pCurrent->GetG() + mazeController->security_map[i][j];
+    h = mazeHandler->Distance(j, i, target->GetCol(), target->GetRow());
+    g = pCurrent->GetG() + mazeHandler->security_map[i][j];
 
     pn = new Node(i, j, pCurrent, g, h);
     // Let's check the color of neighbor
@@ -392,7 +393,7 @@ void Supplier::AddNextStep(Node* pCurrent, DirectionType directionType, priority
             }
             else // pn is BETTER then its copy from pq
             {
-                mazeController->UpdatePQ(pq, pn);
+                mazeHandler->UpdatePQ(pq, pn);
                 gray.erase(it_gray);
                 gray.push_back(*pn);
             }
@@ -401,7 +402,7 @@ void Supplier::AddNextStep(Node* pCurrent, DirectionType directionType, priority
 }
 
 /* Find the shortest path to target using A* algorithm */
-void Supplier::FindPath(MazeController* mazeController)
+void Supplier::FindPath(MazeHandler* mazeHandler)
 {
     vector <Node> gray;
     vector <Node> black;
@@ -415,7 +416,7 @@ void Supplier::FindPath(MazeController* mazeController)
     startX = locationX;
     targetY = target->GetRow();
     targetX = target->GetCol();
-    pn = new Node(startY, startX, nullptr, 0, mazeController->Distance(startX, startY, targetX, targetY));
+    pn = new Node(startY, startX, nullptr, 0, mazeHandler->Distance(startX, startY, targetX, targetY));
     // add start to PQ and to Grays
     pq.push(pn);
     gray.push_back(*pn);
@@ -442,127 +443,116 @@ void Supplier::FindPath(MazeController* mazeController)
                 gray.erase(it_gray);
             // Add neighbors of pCurrent to PQ.
                 // check top neighbor
-            if (mazeController->maze[pCurrent->GetRow() + 1][pCurrent->GetCol()] == SPACE ||
-                mazeController->maze[pCurrent->GetRow() + 1][pCurrent->GetCol()] ==
-                mazeController->maze[target->GetRow()][target->GetCol()])
-                AddNextStep(pCurrent, TOP, pq, gray, black, mazeController);
+            if (mazeHandler->maze[pCurrent->GetRow() + 1][pCurrent->GetCol()] == SPACE ||
+                mazeHandler->maze[pCurrent->GetRow() + 1][pCurrent->GetCol()] ==
+                mazeHandler->maze[target->GetRow()][target->GetCol()])
+                AddNextStep(pCurrent, TOP, pq, gray, black, mazeHandler);
             // check bottom neighbor
-            if (mazeController->maze[pCurrent->GetRow() - 1][pCurrent->GetCol()] == SPACE ||
-                mazeController->maze[pCurrent->GetRow() - 1][pCurrent->GetCol()] ==
-                mazeController->maze[target->GetRow()][target->GetCol()])
-                AddNextStep(pCurrent, BOTTOM, pq, gray, black, mazeController);
+            if (mazeHandler->maze[pCurrent->GetRow() - 1][pCurrent->GetCol()] == SPACE ||
+                mazeHandler->maze[pCurrent->GetRow() - 1][pCurrent->GetCol()] ==
+                mazeHandler->maze[target->GetRow()][target->GetCol()])
+                AddNextStep(pCurrent, BOTTOM, pq, gray, black, mazeHandler);
             // check left neighbor
-            if (mazeController->maze[pCurrent->GetRow()][pCurrent->GetCol() - 1] == SPACE ||
-                mazeController->maze[pCurrent->GetRow()][pCurrent->GetCol() - 1] ==
-                mazeController->maze[target->GetRow()][target->GetCol()])
-                AddNextStep(pCurrent, LEFT, pq, gray, black, mazeController);
+            if (mazeHandler->maze[pCurrent->GetRow()][pCurrent->GetCol() - 1] == SPACE ||
+                mazeHandler->maze[pCurrent->GetRow()][pCurrent->GetCol() - 1] ==
+                mazeHandler->maze[target->GetRow()][target->GetCol()])
+                AddNextStep(pCurrent, LEFT, pq, gray, black, mazeHandler);
             // check right neighbor
-            if (mazeController->maze[pCurrent->GetRow()][pCurrent->GetCol() + 1] == SPACE ||
-                mazeController->maze[pCurrent->GetRow()][pCurrent->GetCol() + 1] ==
-                mazeController->maze[target->GetRow()][target->GetCol()])
-                AddNextStep(pCurrent, RIGHT, pq, gray, black, mazeController);
+            if (mazeHandler->maze[pCurrent->GetRow()][pCurrent->GetCol() + 1] == SPACE ||
+                mazeHandler->maze[pCurrent->GetRow()][pCurrent->GetCol() + 1] ==
+                mazeHandler->maze[target->GetRow()][target->GetCol()])
+                AddNextStep(pCurrent, RIGHT, pq, gray, black, mazeHandler);
         }// else
     }// while
 }
 
 /* Supplier searching for ammo */
-void Supplier::SearchForAmmo(Soldier* pSoldier, MazeController* mazeController, Ammo* ammo1, Ammo* ammo2)
+void Supplier::SearchForAmmo(Soldier* pSoldier, MazeHandler* mazeHandler, Ammo* ammo1, Ammo* ammo2)
 {
     
     /* Calculate the target node and find the path to this point in case when the current soldier do not have one */
     if (target == nullptr)
     {
         FindTargetPoint(ammo1->GetX(), ammo1->GetY(), ammo2->GetX(), ammo2->GetY());
-        FindPath(mazeController);
+        FindPath(mazeHandler);
     }
     /* the target point is already took by other soldier */
-    else if (mazeController->maze[target->GetRow()][target->GetCol()] != AMMO_STOCK)
+    else if (mazeHandler->maze[target->GetRow()][target->GetCol()] != AMMO_STOCK)
     {
         /* if there is still at least one ammo point on the map */
         if (ammo1->GetX() != INFINITY_VALUE || ammo2->GetX() != INFINITY_VALUE)
         {
             FindTargetPoint(ammo1->GetX(), ammo1->GetY(), ammo2->GetX(), ammo2->GetY());
             EmptyPath(); // Delete previous path
-            FindPath(mazeController);
+            FindPath(mazeHandler);
         }
     }
 
     /* When the soldier reached to the ammo point, remove it from the map */
     if (locationX == target->GetCol() && locationY == target->GetRow())
-        mazeController->RemoveAmmoPoint(ammo1, ammo2, locationY, locationX);
+        mazeHandler->RemoveAmmoPoint(ammo1, ammo2, locationY, locationX);
 
-    Move(mazeController, AMMO_STOCK); // Soldier step
+    Move(mazeHandler, AMMO_STOCK); // Soldier step
 }
 
 /* Soldier searching for health */
-void Supplier::SearchForHealth(Soldier* pSoldier,MazeController* mazeController, HealthPoints* hp1, HealthPoints* hp2)
+void Supplier::SearchForHealth(Soldier* pSoldier,MazeHandler* mazeHandler, HealthPoints* hp1, HealthPoints* hp2)
 {
     /* Calculate the target node and find the path to this point in case when the current soldier do not have one */
     if (target == nullptr)
     {
         FindTargetPoint(hp1->GetX(), hp1->GetY(), hp2->GetX(), hp2->GetY());
-        FindPath(mazeController);
+        FindPath(mazeHandler);
     }
     /* the target point is already took by other soldier */
-    else if (mazeController->maze[target->GetRow()][target->GetCol()] != HEALT_POINTS)
+    else if (mazeHandler->maze[target->GetRow()][target->GetCol()] != HEALT_POINTS)
     {
         /* if there is still at least one health point on the map */
         if (hp1->GetX() != INFINITY_VALUE || hp2->GetX() != INFINITY_VALUE)
         {
             FindTargetPoint(hp1->GetX(), hp1->GetY(), hp2->GetX(), hp2->GetY());
             EmptyPath(); // Delete previous path
-            FindPath(mazeController);
+            FindPath(mazeHandler);
         }
     }
 
     /* When the soldier reached to the health point, remove it from the map */
     if (locationX == target->GetCol() && locationY == target->GetRow())
-        mazeController->RemoveHealthPoint(hp1, hp2, locationY, locationX);
+        mazeHandler->RemoveHealthPoint(hp1, hp2, locationY, locationX);
 
-    Move(mazeController, HEALT_POINTS); // Soldier step	
+    Move(mazeHandler, HEALT_POINTS); // Soldier step	
 }
 
 
-
-void Soldier::Attack(MazeController* mazeController, Soldier opponent_team[NUM_SOLDIERS], Soldier opponent)
-{
-    /* If the opponent behind an obstacle, throw grenade */
-    if ((isSecure(mazeController, opponent) || opponent.isSecure(mazeController, *this)) && grenade_ammo > 0)
-        ThrowGrenade(opponent_team, mazeController);
-
-    else if (bullets_ammo > 0)
-        Shoot(opponent_team, mazeController);
-}
-
-void Soldier::SearchForCover(MazeController* mazeController, Soldier opponent)
+void Supplier::SearchForCover(MazeHandler* mazeHandler, Soldier opponent)
 {
     double x, y;
     x = 2 * (double)opponent.GetLocationX() / (double)MSZ - 1;
     y = 2 * (double)opponent.GetLocationY() / (double)MSZ - 1;
     Grenade* pg = new Grenade(x, y);
-    pg->UpdateSecurityMap(mazeController->maze, mazeController->security_map);
+    pg->UpdateSecurityMap(mazeHandler->maze, mazeHandler->security_map);
     /* Calculate the target node and find the path to this point in case when the current soldier do not have one */
     if (target == nullptr)
     {
-        SetSecurePoint(mazeController, opponent, mazeController->rooms[room_index]);
-        FindPath(mazeController);
+        SetSecurePoint(mazeHandler, opponent, mazeHandler->rooms[room_index]);
+        FindPath(mazeHandler);
     }
     /* the secure point is already took by other soldier */
-    else if (mazeController->maze[target->GetRow()][target->GetCol()] != SECURE_POINT)
+    else if (mazeHandler->maze[target->GetRow()][target->GetCol()] != SECURE_POINT)
     {
-        SetSecurePoint(mazeController, opponent, mazeController->rooms[room_index]);
+        SetSecurePoint(mazeHandler, opponent, mazeHandler->rooms[room_index]);
         EmptyPath(); // Delete previous path
-        FindPath(mazeController);
+        FindPath(mazeHandler);
     }
 
     /* When arrived to secure point, paint it SPACE again */
     if (locationX == target->GetCol() && locationY == target->GetRow())
-        mazeController->maze[locationY][locationX] = SPACE;
+        mazeHandler->maze[locationY][locationX] = SPACE;
 
-    Move(mazeController, SECURE_POINT); // Soldier step
+    Move(mazeHandler, SECURE_POINT); // Soldier step
 }
 
-void Soldier::MoveToRandomRoom(MazeController* mazeController)
+void Supplier::MoveToRandomRoom(MazeHandler* mazeHandler)
 {
     int room_index, minX = 0, minY = 0, x = 0, y = 0;
     double h = 0;
@@ -571,46 +561,31 @@ void Soldier::MoveToRandomRoom(MazeController* mazeController)
     {
         room_index = rand() % NUM_ROOMS;
         /* If the center of the room is SPACE, go there*/
-        if (mazeController->maze[mazeController->rooms[room_index].GetCenterY()][mazeController->rooms[room_index].GetCenterX()] == SPACE)
+        if (mazeHandler->maze[mazeHandler->rooms[room_index].GetCenterY()][mazeHandler->rooms[room_index].GetCenterX()] == SPACE)
         {
-            pn = new Node(mazeController->rooms[room_index].GetCenterY(), mazeController->rooms[room_index].GetCenterX(), nullptr, 0, 0);
-            h = mazeController->Distance(locationX, locationY, mazeController->rooms[room_index].GetCenterX(), mazeController->rooms[room_index].GetCenterY());
+            pn = new Node(mazeHandler->rooms[room_index].GetCenterY(), mazeHandler->rooms[room_index].GetCenterX(), nullptr, 0, 0);
+            h = mazeHandler->Distance(locationX, locationY, mazeHandler->rooms[room_index].GetCenterX(), mazeHandler->rooms[room_index].GetCenterY());
         }
         else // Search for random point in the room
         {
-            minX = mazeController->rooms[room_index].GetCenterX() - mazeController->rooms[room_index].GetWidth() / 2;
-            minY = mazeController->rooms[room_index].GetCenterY() - mazeController->rooms[room_index].GetHeight() / 2;
+            minX = mazeHandler->rooms[room_index].GetCenterX() - mazeHandler->rooms[room_index].GetWidth() / 2;
+            minY = mazeHandler->rooms[room_index].GetCenterY() - mazeHandler->rooms[room_index].GetHeight() / 2;
 
-            while (mazeController->maze[y][x] != SPACE)
+            while (mazeHandler->maze[y][x] != SPACE)
             {
                 /* Generate random x and y in the room*/
-                x = rand() % mazeController->rooms[room_index].GetWidth() + minX;
-                y = rand() % mazeController->rooms[room_index].GetHeight() + minY;
+                x = rand() % mazeHandler->rooms[room_index].GetWidth() + minX;
+                y = rand() % mazeHandler->rooms[room_index].GetHeight() + minY;
             }
-            h = mazeController->Distance(locationX, locationY, x, y);
+            h = mazeHandler->Distance(locationX, locationY, x, y);
             pn = new Node(y, x, nullptr, 0, 0);
         }
         target = pn;
         start = new Node(locationY, locationX, nullptr, 0, h);
-        FindPath(mazeController);
+        FindPath(mazeHandler);
     }
 
-    Move(mazeController, MOVEMENT); // Soldier Step
-}
-
-void Soldier::SearchForEnemy(MazeController* mazeController, Soldier opponent_team[NUM_SOLDIERS], bool* withEnemy)
-{
-    int i;
-    for (i = 0; i < NUM_SOLDIERS; i++)
-    {
-        if (room_index == opponent_team[i].GetRoomIndex() && room_index != PATH_INDEX)
-        {
-            Attack(mazeController, opponent_team, opponent_team[i]);
-            SearchForCover(mazeController, opponent_team[i]);
-            *withEnemy = true;
-        }
-    }
-
+    Move(mazeHandler, MOVEMENT); // Soldier Step
 }
 
 
