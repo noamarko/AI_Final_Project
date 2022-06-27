@@ -31,7 +31,7 @@ private:
 	int color;
 
 	Soldier* pTeam;
-	Node* start, * target;
+	Node* start, *target;
 	vector<Node*> path;
 
 	Bullet* pb;
@@ -51,7 +51,8 @@ public:
 
 
 	bool isSecure(MazeHandler* mazeHandler, Soldier opponent);
-
+	bool GetOnMission();
+	void SetOnMission();
 	void SetColor(int team_color);
 	void SetRoomIndex(int index);
 	void SetLocationX(int lx);
@@ -61,7 +62,6 @@ public:
 	void UpdateBulletsAmmo(int num_of_bullets);
 	void UpdateGrenadeAmmo(int num_of_grenades);
 	void UpdateHealthAmmo(int num_of_health);
-	
 	void FindTargetPoint(int x1, int y1, int x2, int y2);
 	void SetSecurePoint(MazeHandler* mazeHandler, Soldier opponent, Room room);
 	void SetPath(Node* current_node);
@@ -72,12 +72,12 @@ public:
 	int CalculateRoomIndex(MazeHandler* mazeHandler);
 	void SetBulletDetails(Soldier opponent_team[NUM_SOLDIERS]);
 	void SetGrenadeDetails(Soldier opponent_team[NUM_SOLDIERS], MazeHandler* mazeHandler);
-
+	void MoveToRoom(MazeHandler* mazeHandler);
 	void AddNextStep(Node* pCurrent, DirectionType directionType, priority_queue <Node*, vector<Node*>, CompareNodes>& pq,
 		vector <Node>& gray, vector <Node>& black, MazeHandler* mazeHandler);
 	void FindPath(MazeHandler* mazeHandler);
 	void SearchForAmmo(Soldier* pSoldier, MazeHandler* mazeHandler, Ammo* ammo1, Ammo* ammo2);
-	void SearchForHealth(Soldier* pSoldier,MazeHandler* mazeHandler, HealthPoints* hp1, HealthPoints* hp2);
+	void SearchForHealth(Soldier* pSoldier, MazeHandler* mazeHandler, HealthPoints* hp1, HealthPoints* hp2);
 
 	void SearchForCover(MazeHandler* mazeHandler, Soldier opponent);
 	void MoveToRandomRoom(MazeHandler* mazeHandler);

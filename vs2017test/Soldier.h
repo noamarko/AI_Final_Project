@@ -10,7 +10,7 @@
 
 using namespace std;
 
-const int START_STACKS_AMMO = 5;
+const int START_STACKS_AMMO = 3;
 const int BULLETS_PER_STACK = 5;
 const int START_GRENADES_AMMO = 5;
 const int START_HEALTH = 1000;
@@ -81,8 +81,8 @@ public:
 	void AddNextStep(Node* pCurrent, DirectionType directionType, priority_queue <Node*, vector<Node*>, CompareNodes>& pq,
 		vector <Node>& gray, vector <Node>& black, MazeHandler* mazeHandler);
 	void FindPath(MazeHandler* mazeHandler);
-	void SearchForAmmo(MazeHandler* mazeHandler, Ammo* ammo1, Ammo* ammo2);
-	void SearchForHealth(MazeHandler* mazeHandler, HealthPoints* hp1, HealthPoints* hp2);
+	void SearchForAmmo(Soldier* pSoldier, MazeHandler* mazeHandler, Ammo* ammo1, Ammo* ammo2);
+	void SearchForHealth(Soldier* pSoldier, MazeHandler* mazeHandler, HealthPoints* hp1, HealthPoints* hp2);
 	void Attack(MazeHandler* mazeHandler, Soldier opponent_team[NUM_SOLDIERS], Soldier opponent);
 	void SearchForCover(MazeHandler* mazeHandler, Soldier opponent);
 	void MoveToRandomRoom(MazeHandler* mazeHandler);

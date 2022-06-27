@@ -711,7 +711,7 @@ void Soldier::FindPath(MazeHandler* mazeHandler)
 }
 
 /* Soldier searching for ammo */
-void Soldier::SearchForAmmo(MazeHandler* mazeHandler, Ammo* ammo1, Ammo* ammo2)
+void Soldier::SearchForAmmo(Soldier* pSoldier, MazeHandler* mazeHandler, Ammo* ammo1, Ammo* ammo2)
 {
     /* Calculate the target node and find the path to this point in case when the current soldier do not have one */
     if (target == nullptr)
@@ -739,7 +739,7 @@ void Soldier::SearchForAmmo(MazeHandler* mazeHandler, Ammo* ammo1, Ammo* ammo2)
 }
 
 /* Soldier searching for health */
-void Soldier::SearchForHealth(MazeHandler* mazeHandler, HealthPoints* hp1, HealthPoints* hp2)
+void Soldier::SearchForHealth(Soldier* pSoldier, MazeHandler* mazeHandler, HealthPoints* hp1, HealthPoints* hp2)
 {
     /* Calculate the target node and find the path to this point in case when the current soldier do not have one */
     if (target == nullptr)

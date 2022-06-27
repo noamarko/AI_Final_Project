@@ -2,11 +2,12 @@
 
 using namespace std;
 
-Ammo* ammo1, * ammo2;
-HealthPoints* hp1, * hp2;
+Ammo* ammo1, *ammo2;
+HealthPoints* hp1, *hp2;
 Soldier cyan_team[NUM_SOLDIERS];
 Soldier olive_team[NUM_SOLDIERS];
-
+Supplier cyan_supplier;
+Supplier olive_supplier;
 Details* pd = nullptr;
 MazeHandler* mazeHandler = nullptr;
 
@@ -48,6 +49,13 @@ void GenerateTeams()
 void CalaculateTeamPosition(Soldier team[NUM_SOLDIERS], int roomNumber, int team_color)
 {
 	Soldier* pSoldier;
+	Supplier* pSupplier;
+
+	if (team_color == CYAN_SOLDIER)
+		pSupplier = &cyan_supplier;
+	else
+		pSupplier = &olive_supplier;
+
 	int randomX, randomY;
 	for (int i = 0; i < NUM_SOLDIERS; i++)
 	{
@@ -66,6 +74,19 @@ void CalaculateTeamPosition(Soldier team[NUM_SOLDIERS], int roomNumber, int team
 		pSoldier->SetRoomIndex(roomNumber);
 		mazeHandler->maze[pSoldier->GetLocationY()][pSoldier->GetLocationX()] = pSoldier->GetColor();
 	}
+	do
+	{
+		randomX = rand() % mazeHandler->rooms[roomNumber].GetWidth() +
+			(mazeHandler->rooms[roomNumber].GetCenterX() - mazeHandler->rooms[roomNumber].GetWidth() / 2);
+		randomY = rand() % mazeHandler->rooms[roomNumber].GetHeight() +
+			(mazeHandler->rooms[roomNumber].GetCenterY() - mazeHandler->rooms[roomNumber].GetHeight() / 2);
+		pSupplier->SetLocationX(randomX);
+		pSupplier->SetLocationY(randomY);
+	} while (mazeHandler->maze[pSupplier->GetLocationY()][pSupplier->GetLocationX()] != SPACE);
+	pSupplier->SetColor(team_color);
+	pSupplier->SetRoomIndex(roomNumber);
+	mazeHandler->maze[pSupplier->GetLocationY()][pSupplier->GetLocationX()] = pSupplier->GetColor();
+	
 }
 
 /* Paint Dead soldiers as SPACE and remove them from room */
@@ -104,25 +125,36 @@ void PlayTurn(Soldier* pSoldier)
 			pSoldier->HideFromEnemy(mazeHandler, cyan_team, &withEnemy);
 		if (pSoldier->GetBulletsAmmo() > 0)
 			pSoldier->Reload();
-			
-		if (0 < pSoldier->GetBulletsAmmo() < 3 ) { // && !supplier->OnMission()
-			//supplierGiveAmmo(pSoldier.GetLocationX(), pSoldier.GetLocationY(), &supplierOnMission)
+		if (pSoldier->GetColor() == CYAN_SOLDIER)
+
+			if (0 < pSoldier->GetBulletsAmmo() < 3 && !cyan_supplier.GetOnMission()) { // && !supplier->OnMission()
+				//supplierGiveAmmo(pSoldier.GetLocationX(), pSoldier.GetLocationY(), &supplierOnMission)
+				cyan_supplier.SetOnMission();
+				cyan_supplier.SearchForAmmo(pSoldier, mazeHandler, ammo1, ammo2);
+				cyan_supplier.MoveToRoom(mazeHandler);
+					
+			}
+		else if (0 < pSoldier->GetBulletsAmmo() < 3 && !olive_supplier.GetOnMission()) {
+			olive_supplier.SetOnMission();
+			olive_supplier.SearchForAmmo(pSoldier, mazeHandler, ammo1, ammo2);
+			olive_supplier.MoveToRoom(mazeHandler);
 		}
+		
 	}
 
 	//if ((pSoldier->GetBulletsAmmo() < BULLET_SHORTAGE || pSoldier->GetGrenadeAmmo() < GRENADE_SHORTAGE)
 		//&& (ammo1->GetX() != INFINITY_VALUE || ammo2->GetX() != INFINITY_VALUE))
 		//pSoldier->SearchForAmmo(mazeHandler, ammo1, ammo2);
-		
+
 	else if (pSoldier->GetHealth() < HEALTH_SHORTAGE && (hp1->GetX() != INFINITY_VALUE || hp2->GetX() != INFINITY_VALUE))
-		pSoldier->SearchForHealth(mazeHandler, hp1, hp2);
+		pSoldier->SearchForHealth(pSoldier, mazeHandler, hp1, hp2);
 	else
 	{
 		if (pSoldier->GetColor() == CYAN_SOLDIER)
 			pSoldier->SearchForEnemy(mazeHandler, olive_team, &withEnemy);
 		else
 			pSoldier->SearchForEnemy(mazeHandler, cyan_team, &withEnemy);
-		
+
 		if (!withEnemy)
 			pSoldier->MoveToRandomRoom(mazeHandler);
 	}
@@ -169,7 +201,7 @@ void Play()
 			if (olive_team[i].GetHealth() > 0)
 				olive_alive = true;
 		}
-		CheckIfFinished(cyan_alive, olive_alive);		
+		CheckIfFinished(cyan_alive, olive_alive);
 	}
 
 	if (!isPlaying)

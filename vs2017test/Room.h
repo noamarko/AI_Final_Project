@@ -20,7 +20,8 @@ const int SECURE_POINT = 13;
 const int MOVEMENT = 14;
 
 const int NUM_ROOMS = 12;
-
+const int CYAN_BASE = 1;
+const int OLIVE_BASE = 12;
 
 class Room
 {

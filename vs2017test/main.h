@@ -16,7 +16,7 @@
 #include "Soldier.h"
 #include "Details.h"
 #include "MazeHandler.h"
-
+#include "Supplier.h"
 
 const int W = 600; // window width
 const int H = 600; // window height
