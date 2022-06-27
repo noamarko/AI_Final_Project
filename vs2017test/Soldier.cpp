@@ -10,7 +10,7 @@ Soldier::Soldier()
     locationX = 0;
     locationY = 0;
     health = START_HEALTH;
-    total_bullets_ammo = START_BULLETS_AMMO;
+    total_bullets_ammo = START_STACKS_AMMO;
     bullets_stack_ammo = BULLETS_PER_STACK;
     grenade_ammo = START_GRENADES_AMMO;
     isInRoom = true;
@@ -27,7 +27,7 @@ Soldier::Soldier(int x, int y, int room, int team_color)
     locationX = x;
     locationY = y;
     health = START_HEALTH;
-    total_bullets_ammo = START_BULLETS_AMMO; // Total amount of bullets in the vest
+    total_bullets_ammo = START_STACKS_AMMO; // Total amount of bullets in the vest
     bullets_stack_ammo = BULLETS_PER_STACK; // Total amount of bullets in weapon
     grenade_ammo = START_GRENADES_AMMO;
     isInRoom = true;
@@ -150,6 +150,10 @@ void Soldier::UpdateGrenadeAmmo(int num_of_grenades)
 void Soldier::Reload() {
     bullets_stack_ammo += 5;
     total_bullets_ammo -= 1;
+    if (color == CYAN_SOLDIER)
+        printf("Cyan soldier loaded gun\n");
+    else
+        printf("Olive soldier loaded gun\n");
 }
 
 void Soldier::FindTargetPoint(int x1, int y1, int x2, int y2)
@@ -424,9 +428,9 @@ void Soldier::ShotMovement(MazeHandler* mazeHandler, Soldier opponent_team[NUM_S
                         pOpponent->SetHealth(0);
 
                     if (pOpponent->GetColor() == CYAN_SOLDIER)
-                        printf("Cyan Soldier Was Wounded!, Health: %d\n", pOpponent->GetHealth());
+                        printf("Cyan Soldier Was Wounded by bullet!, Health: %d\n", pOpponent->GetHealth());
                     else
-                        printf("Olive Soldier Was Wounded!, Health: %d\n", pOpponent->GetHealth());
+                        printf("Olive Soldier Was Wounded by bullet!, Health: %d\n", pOpponent->GetHealth());
 
                     pb->StopMoving();
 
@@ -860,6 +864,10 @@ void Soldier::HideFromEnemy(MazeHandler* mazeHandler, Soldier opponent_team[NUM_
         {
             SearchForCover(mazeHandler, opponent_team[i]);
             *withEnemy = true;
+            if (color == CYAN_SOLDIER)
+                printf("Cyan soldier is hiding from enemy\n");
+            else
+                printf("Olive soldier is hiding from enemy\n");
         }
     }
 

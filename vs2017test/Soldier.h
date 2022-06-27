@@ -10,10 +10,10 @@
 
 using namespace std;
 
-const int START_BULLETS_AMMO = 20;
+const int START_STACKS_AMMO = 5;
 const int BULLETS_PER_STACK = 5;
 const int START_GRENADES_AMMO = 5;
-const int START_HEALTH = 100;
+const int START_HEALTH = 1000;
 const int NUM_SOLDIERS = 2;
 const int PATH_INDEX = NUM_ROOMS + 10;
 

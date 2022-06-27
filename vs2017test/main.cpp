@@ -97,23 +97,22 @@ void PlayTurn(Soldier* pSoldier)
 	if (pSoldier->GetHealth() <= 0)
 		return;
 
-	if (pSoldier->GetBulletsAmmo() == 0) {
+	if (pSoldier->GetBulletsStack() == 0) {
 		if (pSoldier->GetColor() == CYAN_SOLDIER)
 			pSoldier->HideFromEnemy(mazeHandler, olive_team, &withEnemy);
-		
 		else
 			pSoldier->HideFromEnemy(mazeHandler, cyan_team, &withEnemy);
-		if (pSoldier->GetBulletsStack() > 0)
+		if (pSoldier->GetBulletsAmmo() > 0)
 			pSoldier->Reload();
-
-		if (0 < pSoldier->GetBulletsStack() < 3 ) { // && !supplier->OnMission()
+			
+		if (0 < pSoldier->GetBulletsAmmo() < 3 ) { // && !supplier->OnMission()
 			//supplierGiveAmmo(pSoldier.GetLocationX(), pSoldier.GetLocationY(), &supplierOnMission)
 		}
 	}
 
-	if ((pSoldier->GetBulletsAmmo() < BULLET_SHORTAGE || pSoldier->GetGrenadeAmmo() < GRENADE_SHORTAGE)
-		&& (ammo1->GetX() != INFINITY_VALUE || ammo2->GetX() != INFINITY_VALUE))
-		pSoldier->SearchForAmmo(mazeHandler, ammo1, ammo2);
+	//if ((pSoldier->GetBulletsAmmo() < BULLET_SHORTAGE || pSoldier->GetGrenadeAmmo() < GRENADE_SHORTAGE)
+		//&& (ammo1->GetX() != INFINITY_VALUE || ammo2->GetX() != INFINITY_VALUE))
+		//pSoldier->SearchForAmmo(mazeHandler, ammo1, ammo2);
 		
 	else if (pSoldier->GetHealth() < HEALTH_SHORTAGE && (hp1->GetX() != INFINITY_VALUE || hp2->GetX() != INFINITY_VALUE))
 		pSoldier->SearchForHealth(mazeHandler, hp1, hp2);
